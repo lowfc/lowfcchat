@@ -142,12 +142,12 @@ def fp():
             if len(request.form['search'].split()) == 2:
                 name = request.form['search'].split()
                 logins = User.query.filter((((User.firstname == name[0]) & (User.lastname == name[1])) | (
-                            (User.firstname == name[1]) & (User.lastname == name[0]))) & (
-                                                       User.id != session['logged_user_id'])).all()
+                        (User.firstname == name[1]) & (User.lastname == name[0]))) & (
+                                                   User.id != session['logged_user_id'])).all()
             else:
                 logins = User.query.filter(((User.firstname == request.form['search']) | (
-                            User.lastname == request.form['search']) | (User.login == request.form['search'])) & (
-                                                       User.id != session['logged_user_id'])).all()
+                        User.lastname == request.form['search']) | (User.login == request.form['search'])) & (
+                                                   User.id != session['logged_user_id'])).all()
             return render_template('findPeople.html', logins=logins)
     else:
         return redirect('/login')
@@ -192,8 +192,7 @@ def adminremovetheuser(id):
 
 @app.route('/admin-add-user', methods=['POST', 'GET'])  # Дополнительно указываем методы для работы со страницей
 def adminadduser():
-    if 'logged_user_id' in session and session[
-        'logged_user_id'] == 0:  # 'logged_user_id' in session and session['logged_user_id'] == 1:
+    if 'logged_user_id' in session and session['logged_user_id'] == 0:
         if request.method == 'POST':  # если на страницу перешли с методом POST
             if 'isEdit' not in request.form:
                 login = request.form['login']  # получаем в переменные значения полей из формы
