@@ -1,13 +1,16 @@
 {% for i in messages %}
     <div class="list-group" id="{{i.id}}">
         {% if i.sendby == 0 %}
-        <p class="list-group-item list-group-item-action list-group-item-info">{{i.content}}</p>
+            <p class="list-group-item list-group-item-action list-group-item-info">{{i.content}}</p>
         {% else %}
-        <p class="list-group-item list-group-item-action list-group-item-secondary">[{{i.sendby}}] {{i.content}}
             {% if i.sendby == session['logged_user_id'] %}
-            (<a onclick="deleteMessage({{ i.id }})">Удалить</a>)
+            <p class="list-group-item list-group-item-action list-group-item-secondary">(Вы) {{i.content}}
+                (<a onclick="deleteMessage({{ i.id }})">Удалить</a>)
+            </p>
+            {% else %}
+            <p class="list-group-item list-group-item-action list-group-item-secondary">{{i.content}}
+            </p>
             {% endif %}
-        </p>
         {% endif %}
     </div>
 {% endfor %}

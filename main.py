@@ -268,7 +268,7 @@ def createchatwith():
             db.session.commit()
         except:
             return 'Обнаружены ошибки бэкэнда'
-        return redirect('/')
+        return redirect('/chatroom/'+str(chat.id))
     else:
         return redirect('/login')
 
@@ -292,7 +292,14 @@ def chatroom(chatid):
                     return 'ошибки бэкэнда'
                 return 'lololo'
             else:
-                return render_template('messenger.html', chatid=chatid)
+                current_chat = Chats.query.get_or_404(chatid)
+                if current_chat.fuserid == session['logged_user_id']:
+                    interlocutor_id = current_chat.suserid
+                else:
+                    interlocutor_id = current_chat.fuserid
+                interlocutor = User.query.get_or_404(interlocutor_id)
+                return render_template('messenger.html', chatid=chatid, interlocutor=(interlocutor.firstname,
+                                                                                      interlocutor.lastname))
         else:
             return redirect('/chat')
     else:

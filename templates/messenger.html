@@ -24,12 +24,17 @@ var xmlhttp = getXmlHttp();
 	checkUpdate(chatid);
 </script>
 
-
 <input type="hidden" value="" id="lastMessageID">
 
 
+<!-- Вот так можно обратиться к имени собеседника -->
+<h3>{{interlocutor[0]}} {{interlocutor[1]}}</h3>
+
+
+<!-- При загрузке страницы содержимое messageBox будет очищено, ничего не добавлять -->
 <div class="container mt-5" id="messageBox" style="overflow: auto; height: 100%;">
 
+    <!-- Анимация загрузки -->
     <div class="spinner-grow text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
@@ -51,8 +56,10 @@ var xmlhttp = getXmlHttp();
     <div class="spinner-grow text-dark" role="status">
       <span class="sr-only">Loading...</span>
     </div>
+    <!-- Анимация загрузки -->
 
 </div>
+
 
 
 

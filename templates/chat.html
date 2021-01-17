@@ -13,8 +13,35 @@
                 <a href="/chatroom/{{i.id}}">
                     <b>{{ i.chatname }}</b>
                 </a>
+                <button type="button" class="btn btn-danger float-lg-right" data-toggle="modal" data-target="#exampleModal3{{i.id}}">
+                  Удалить
+                </button>
                 <p class="text-black-50">создан {{ i.dateofcreation }}</p>
             </li>
+
+          <!-- Button trigger modal 1 -->
+        <div class="modal fade" id="exampleModal3{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModal3Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModal3Label">Удаление "{{i.chatname}}" </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Вы действительно хотите удалить {{ i.chatname }}?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <a href="/admin-add-chat/delete/{{ i.id }}" class="btn btn-danger">Удалить</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Button trigger modal 1 -->
+
+
         {% endfor %}
       </ul>
     </div>
