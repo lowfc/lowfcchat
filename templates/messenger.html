@@ -1,0 +1,42 @@
+{% extends 'basic.html' %}
+
+{% block title %}
+Чаты
+{% endblock %}
+
+{% block body %}
+<script src="../static/js/nosend.js"></script>
+
+<script type="text/javascript">
+var chatid = {{chatid}};
+var xmlhttp = getXmlHttp();
+	xmlhttp.open('POST', '/getallmessages', true);
+	xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURIComponent('allMesages') + "&chatid=" + encodeURIComponent(chatid));
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4) {
+			if (xmlhttp.status == 200) {
+                var box = document.getElementById('messageBox');
+				box.innerHTML = xmlhttp.responseText;
+			}
+		}
+	};
+	checkUpdate(chatid);
+</script>
+
+
+<input type="hidden" value="" id="lastMessageID">
+
+
+<div class="container mt-5" id="messageBox">
+
+
+</div>
+<div class="fixed-bottom input-group w-100" name="sender">
+    <input type="text" class="form-control" id="inputContent" name="message" placeholder="Введите сообщение" aria-describedby="basic-addon1">
+    <input type="hidden" id="inputChatID" value="{{chatid}}">
+    <div class="input-group-append">
+        <button class="btn btn-success" onclick="sendMessage()">Отправить</button>
+    </div>
+</div>
+{% endblock %}

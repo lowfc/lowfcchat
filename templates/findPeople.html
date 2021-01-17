@@ -1,0 +1,53 @@
+{% extends 'basic.html' %}
+
+{% block title %}
+Поиск людей
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <form class = 'form-inline' style="margin-bottom: 50px;" method="post">
+        <input type="text" name = 'search' class="form-control" placeholder="Поиск" style="width:90%; margin-right: 21px;">
+        <input type="submit" class="btn btn-success" value="Поиск"><br>
+    </form>
+    <div class="card">
+      <ul class="list-group list-group-flush">
+         {% for i in logins %}
+            <li class="list-group-item">
+                <div class="form-inline">
+                <p class="col-md-8"><b>{{i.lastname}} {{i.firstname}}</b> <i>#{{i.login}}</i></p>
+                <button type="button" class="btn btn-outline-success col-md-4" data-toggle="modal" data-target="#exampleModal3{{i.id}}">
+                          Начать чат
+                </button>
+                </div>
+                <!-- Button trigger modal 1 -->
+                    <div class="modal fade" id="exampleModal3{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModal3Label" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModal3Label">{{ i.firstname }} ждет новых сообщений!</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form method="post" action="/createchatwith">
+                              <div class="modal-body">
+                                Имя Вашего будущего чата:
+                                <input type="text" name = 'chatname' class="form-control" placeholder="Имя чата" value="chat-{{i.id}}@{{session['logged_user_id']}}">
+                                <input type="hidden" name="userid" value="{{ i.id }}">
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                <button type="submit" class="btn btn-success">Создать</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                <!-- Button trigger modal 1 -->
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+</div>
+{% endblock %}

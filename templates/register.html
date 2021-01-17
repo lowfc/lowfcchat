@@ -1,0 +1,28 @@
+{% extends 'basic.html' %}
+
+{% block title %}
+Регистрация
+{% endblock %}
+
+{% block body %}
+{% if errors|length > 0 %}
+<div class="container mt-5">
+    <div class="alert alert-danger">
+        {% for i in errors %}
+            <p>> {{ i }}!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+<div class="container mt-5">
+    <h1>Войти</h1>
+    <form method="post" class="container mt-5 b-50">
+        <input type="text" name = 'login' class="form-control" placeholder="Логин" required><br>
+        <input type="password" name = 'password' class="form-control" placeholder="Пароль" required><br>
+        <input type="password" name = 'repassword' class="form-control" placeholder="Подтвердите пароль" required><br>
+        <input type="text" name = 'firstname' class="form-control" placeholder="Имя" required><br>
+        <input type="text" name = 'lastname' class="form-control" placeholder="Фамилия" required><br>
+        <input type="submit" class="btn btn-success" value="Регистрация"><br>
+    </form>
+</div>
+{% endblock %}
