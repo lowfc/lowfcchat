@@ -33,7 +33,7 @@
                           <form method="post" action="/createchatwith">
                               <div class="modal-body">
                                 Имя Вашего будущего чата:
-                                <input type="text" name = 'chatname' class="form-control" placeholder="Имя чата" value="chat-{{i.id}}@{{session['logged_user_id']}}">
+                                <input type="text" name = 'chatname' class="form-control" placeholder="Имя чата" value="Чат {{i.login}} и {{session['logged_user_login']}}">
                                 <input type="hidden" name="userid" value="{{ i.id }}">
                               </div>
                               <div class="modal-footer">

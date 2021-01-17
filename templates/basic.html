@@ -17,10 +17,11 @@
             <a class="p-2 text-dark" href="/findpeople">Поиск людей</a>
             <a class="p-2 text-dark" href="/chat">Чат</a>
               <a class="p-2 text-danger" href="/login">Выйти</a>
-              {% if session['logged_user_id']==1 %}
+              {% if session['logged_user_id']==0 %}
               <a class="p-2 text-primary" href="/admin-add-chat">[admin] Чаты</a>
               <a class="p-2 text-primary" href="/admin-add-user">[admin] Пользователи</a>
               <a class="p-2 text-primary" href="/admin-chat-users">[admin] Чат-соответствия</a>
+              <a class="p-2 text-primary" href="/admin-messages">[admin] Сообщения</a>
               {% endif %}
           </nav>
     </header>

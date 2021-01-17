@@ -23,7 +23,7 @@ class User(db.Model):  # класс объявляет таблицу в бд
 
 class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # поля таблицы
-    chatid = db.Column(db.Integer, nullable=False)
+    chatid = db.Column(db.Integer, db.ForeignKey('chats.id'), nullable=False)
     sendby = db.Column(db.Integer, nullable=False)
     content = db.Column(db.String(200), nullable=False)
     dateofsend = db.Column(db.DateTime, default=datetime.utcnow)
@@ -33,11 +33,14 @@ class Messages(db.Model):
 
 
 class Chats(db.Model):
+    __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)  # поля таблицы
     chatname = db.Column(db.String(50), nullable=False)
     dateofcreation = db.Column(db.DateTime, default=datetime.utcnow)
     fuserid = db.Column(db.Integer, nullable=False)
     suserid = db.Column(db.Integer, nullable=False)
+    uchats = db.relationship('UserChats', cascade="all,delete", backref='chats')
+    messages = db.relationship('Messages', cascade="all,delete", backref='chats')
 
     def __repr__(self):  # при получении объекта класса автоматически возвращается его id
         return '<Chat %r>' % self.id
@@ -46,7 +49,7 @@ class Chats(db.Model):
 class UserChats(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # поля таблицы
     userid = db.Column(db.Integer, nullable=False)
-    chatid = db.Column(db.Integer, nullable=False)
+    chatid = db.Column(db.Integer, db.ForeignKey('chats.id'), nullable=False)
 
     def __repr__(self):  # при получении объекта класса автоматически возвращается его id
         return '<UserChat %r>' % self.id
@@ -83,6 +86,7 @@ def login():
             if i.login == login:
                 if check_password_hash(i.password, password):
                     session['logged_user_id'] = i.id
+                    session['logged_user_login'] = login
                     return redirect('/')
                 else:
                     errors.append("Пароль введен неверно")
@@ -176,10 +180,10 @@ def admindeletechat(chatid):
         return redirect('/login')
 
 
-@app.route('/admin-add-user/delete/<int:id>')
-def adminremovetheuser(id):
+@app.route('/admin-add-user/delete/<int:uid>')
+def adminremovetheuser(uid):
     if 'logged_user_id' in session and session['logged_user_id'] == 0:
-        user = User.query.get_or_404(id)
+        user = User.query.get_or_404(uid)
         try:
             db.session.delete(user)
             db.session.commit()
@@ -188,6 +192,13 @@ def adminremovetheuser(id):
             return 'Обнаружены ошибки бэкэнда.'
     else:
         return redirect('/login')
+
+
+@app.route('/admin-messages')
+def adminmessages():
+    if 'logged_user_id' in session and session['logged_user_id'] == 0:
+        messages = Messages.query.order_by(Messages.id).all()  # Получение записей из бд
+        return render_template('adminmessages.html', messages=messages)  # Если обратились с методом GET, то просто
 
 
 @app.route('/admin-add-user', methods=['POST', 'GET'])  # Дополнительно указываем методы для работы со страницей
@@ -344,7 +355,10 @@ def deletemessage():
 def return_last_id():
     if 'logged_user_id' in session:
         message = Messages.query.order_by(Messages.id).filter(Messages.chatid == request.form['chatid']).all()[::-1]
-        return str(message[0].id)
+        if len(message) > 0:
+            return str(message[0].id)
+        else:
+            return 'None'
     else:
         return redirect('/login')
 

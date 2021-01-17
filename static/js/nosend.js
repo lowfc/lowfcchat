@@ -77,7 +77,7 @@ var xmlhttp = getXmlHttp();
 				    }
                     document.getElementById('lastMessageID').value = xmlhttp.responseText;
 				}
-				setTimeout(checkUpdate, 1000, chatid);
+				setTimeout(checkUpdate, 10000, chatid);
 			}
 		}
 	};
