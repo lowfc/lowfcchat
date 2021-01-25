@@ -1,0 +1,19 @@
+{% extends 'basic.html' %}
+
+{% block title %}
+Загрузите фото!
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div style="width: 50%; margin: auto; background: #dbdbdb; display: flex; justify-content: space-between; padding: 20px; border-radius: 15px;">
+        <form enctype="multipart/form-data" method="post" action="/senduserpic" style="margin: auto; justify-content: space-between;">
+               <p>Загрузите ваши фотографии на сервер</p> <br>
+               <input class="btn btn-primary" type="file" name="photo" accept="image/*,image/png">
+                <br>
+                <br>
+               <input type="submit" value="Сохранить">
+        </form>
+    </div>
+</div>
+{% endblock %}

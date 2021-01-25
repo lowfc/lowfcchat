@@ -1,0 +1,44 @@
+{% extends 'basic.html' %}
+{% block title %}
+Ваш аккаунт
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div style="background: #DEDEDE; width: 700px; height: 800px; margin: 0 auto; border-radius: 20px;">
+        {% if is_default_photo %}
+            <img src="../static/user_photos/default.jpg" class="img-thumbnail" style="width: 250px; height: 250px">
+        {% else %}
+            <img src="static/user_photos/{{user.id}}_userpic.jpg" class="img-thumbnail" style="width: 250px; height: 250px">
+        {% endif %}
+        <h3>{{user.lastname}} {{user.firstname}}</h3>
+        <p>Зарегестрирован {{user.regDate}}</p>
+        <button type="button" class="btn btn-outline-success col-md-4" data-toggle="modal" data-target="#exampleModal3{{user.id}}">
+                          Начать чат
+        </button>
+        <div class="modal fade" id="exampleModal3{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModal3Label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModal3Label">{{ user.firstname }} ждет новых сообщений!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="/createchatwith">
+                        <div class="modal-body">
+                            Имя Вашего будущего чата:
+                            <input type="text" name = 'chatname' class="form-control" placeholder="Имя чата" value="Чат {{user.login}} и {{session['logged_user_login']}}">
+                            <input type="hidden" name="userid" value="{{ user.id }}">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-success">Создать</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

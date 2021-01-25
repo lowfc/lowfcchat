@@ -3,7 +3,6 @@
 {% block title %}
 Поиск людей
 {% endblock %}
-
 {% block body %}
 <div class="container mt-5">
     <form class = 'form-inline' style="margin-bottom: 50px;" method="post">
@@ -12,6 +11,7 @@
     </form>
     <div class="card">
       <ul class="list-group list-group-flush">
+         {% if logins|length > 0 %}
          {% for i in logins %}
             <li class="list-group-item">
                 <div class="form-inline">
@@ -47,6 +47,9 @@
                 <!-- Button trigger modal 1 -->
             </li>
         {% endfor %}
+        {% else %}
+          <p class="text-sm-center" >Воспользуйтесь поиском, введите имя, фамилию, или все вместе</p>
+        {% endif %}
       </ul>
     </div>
 </div>

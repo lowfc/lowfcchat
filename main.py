@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, session
+import os
+from flask import Flask, render_template, request, redirect, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)  # приложение flask
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'  # задаем параметры бд для приложения
@@ -55,10 +57,25 @@ class UserChats(db.Model):
         return '<UserChat %r>' % self.id
 
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():  # вызывается при переходе на ссыль
     if 'logged_user_id' in session:
-        return render_template('index.html')
+        if request.method == 'GET':
+            user = User.query.get_or_404(session['logged_user_id'])
+            is_default_photo = not os.path.exists('static/user_photos/{}_userpic.jpg'.format(session["logged_user_id"]))
+            return render_template('index.html', user=user, is_default_photo=is_default_photo)
+        else:
+            user = User.query.get_or_404(session['logged_user_id'])
+            user.login = request.form['login']
+            user.firstname = request.form['firstname']
+            user.lastname = request.form['lastname']
+            try:  # Пробуем добавить запись в таблицу
+                db.session.commit()  # Применяем изменения в бд
+                flash('Данные пользователя изменены!', 'success')
+                return redirect('/')  # Редиректим на главную
+            except:
+                return 'Обнаружены ошибки бэкэнда'
+
     else:
         return redirect('/login')
 
@@ -77,7 +94,6 @@ def chat():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    errors = []
     if request.method == 'POST':
         login = request.form['login']  # получаем в переменные значения полей из формы
         password = request.form['password']
@@ -89,10 +105,10 @@ def login():
                     session['logged_user_login'] = login
                     return redirect('/')
                 else:
-                    errors.append("Пароль введен неверно")
-                    return render_template('login.html', errors=errors)
-        errors.append("Учетная запись с таким логином не найдена")
-        return render_template('login.html', errors=errors)
+                    flash("Пароль введен неверно", 'error')
+                    return render_template('login.html')
+        flash("Учетная запись с таким логином не найдена", 'error')
+        return render_template('login.html')
     else:
         session.pop('logged_user_id', None)
         return render_template('login.html')
@@ -109,7 +125,7 @@ def adminchatusers():
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
-    errors = []
+    errors = False
     if request.method == 'POST':
         login = request.form['login']
         password = request.form['password']
@@ -117,12 +133,15 @@ def register():
         firstname = request.form['firstname']
         lastname = request.form['lastname']
         if User.query.filter(User.login == login).first() is not None:
-            errors.append('Такой логин уже существует')
+            flash('Такой логин уже существует', 'error')
+            errors = True
         if password != repassword:
-            errors.append('Пароли не совпадают')
+            flash('Пароли не совпадают', 'error')
+            errors = True
         if len(password) < 8:
-            errors.append('Пароль должен содержать от 8 символов')
-        if len(errors) == 0:
+            flash('Пароль должен содержать от 8 символов', 'error')
+            errors = True
+        if not errors:
             user = User(login=login, password=generate_password_hash(password),
                         firstname=firstname, lastname=lastname)  # создаем экземпляр класса
             try:  # Пробуем добавить запись в таблицу
@@ -132,7 +151,7 @@ def register():
                 return redirect('/')  # Редиректим на главную
             except:
                 return 'Обнаружены ошибки бэкэнда'
-        return render_template('register.html', errors=errors)
+        return redirect('/register')
     else:
         return render_template('register.html')
 
@@ -176,6 +195,23 @@ def admindeletechat(chatid):
             return redirect('/admin-add-chat')
         except:
             return 'Обнаружены ошибки бэкэнда.'
+    else:
+        return redirect('/login')
+
+
+@app.route('/userchatdelete/<int:chatid>')
+def userdeletechat(chatid):
+    if 'logged_user_id' in session:
+        chat = Chats.query.get_or_404(chatid)
+        if chat.fuserid == session['logged_user_id'] or chat.suserid == session['logged_user_id']:
+            try:
+                db.session.delete(chat)
+                db.session.commit()
+                return redirect('/chat')
+            except:
+                return 'Обнаружены ошибки бэкэнда.'
+        else:
+            return 'Это не ваш чат'
     else:
         return redirect('/login')
 
@@ -268,7 +304,7 @@ def createchatwith():
             db.session.commit()
         except:
             return 'Обнаружены ошибки бэкэнда'
-        return redirect('/chatroom/'+str(chat.id))
+        return redirect('/chatroom/' + str(chat.id))
     else:
         return redirect('/login')
 
@@ -298,8 +334,11 @@ def chatroom(chatid):
                 else:
                     interlocutor_id = current_chat.fuserid
                 interlocutor = User.query.get_or_404(interlocutor_id)
+                is_default_photo = not os.path.exists('static/user_photos/{}_userpic.jpg'.format(str(interlocutor.id)))
                 return render_template('messenger.html', chatid=chatid, interlocutor=(interlocutor.firstname,
-                                                                                      interlocutor.lastname))
+                                                                                      interlocutor.lastname),
+                                       is_default_photo=is_default_photo, interlocutor_id=interlocutor_id,
+                                       chatname=current_chat.chatname)
         else:
             return redirect('/chat')
     else:
@@ -323,16 +362,16 @@ def getallmessage():
 def addmessage():
     if 'logged_user_id' in session:
         if request.method == 'POST':
-            try:
-                newmessage = Messages(chatid=request.form['chatid'], sendby=session['logged_user_id'],
-                                      content=request.form['message'])
-                db.session.add(newmessage)
-                db.session.commit()
-            except:
-                return 'ошибки бэкэнда'
-            return '''<div class="list-group" id={}> <p class="list-group-item list-group-item-action 
-            list-group-item-secondary">[{}] {} (<a onclick="deleteMessage({})">Удалить</a>)</p> </div> 
-            '''.format(newmessage.id, session['logged_user_id'], request.form['message'], newmessage.id)
+            if len(request.form['message'].strip()) > 0:
+                try:
+                    newmessage = Messages(chatid=request.form['chatid'], sendby=session['logged_user_id'],
+                                          content=request.form['message'])
+                    db.session.add(newmessage)
+                    db.session.commit()
+                except:
+                    return 'ошибки бэкэнда'
+                return render_template('messages.html', messages=[newmessage])
+            return '<empty>'
     else:
         return redirect('/login')
 
@@ -378,9 +417,38 @@ def return_after_update():
         if lastmessage is not None:
             messages = Messages.query.filter(Messages.dateofsend > lastmessage.dateofsend,
                                              Messages.sendby != session['logged_user_id']).all()
-        return render_template('messages.html', messages=messages)
+        return render_template('messages.html', messages=messages, dest='TEST')
     else:
         return redirect('/login')
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ('jpg', 'jpeg', 'png')
+
+
+def give_me_the_extends(filename):
+    return filename.rsplit('.', 1)[1]
+
+
+@app.route('/senduserpic', methods=['POST', 'GET'])
+def senduserpic():
+    if request.method == 'GET':
+        return render_template('picdrawer.html')
+    else:
+        file = request.files['photo']
+        if file and allowed_file(file.filename):
+            p_count = str(session['logged_user_id']) + '_userpic' + '.jpg'
+            file.save(os.path.join('static/user_photos', p_count))
+            flash('Фото изменено! Обновите страницу (Ctrl + f5)', 'success')
+        return redirect('/')
+
+
+@app.route('/id<int:userid>')
+def userprofile(userid):
+    user = User.query.get_or_404(userid)
+    is_default_photo = not os.path.exists('static/user_photos/{}_userpic.jpg'.format(user.id))
+    return render_template('userprofile.html', user=user, is_default_photo=is_default_photo)
 
 
 if __name__ == '__main__':

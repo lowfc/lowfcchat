@@ -30,11 +30,13 @@
                 </button>
               </div>
               <div class="modal-body">
-                Вы действительно хотите удалить {{ i.chatname }}?
+                Вы действительно хотите удалить {{ i.chatname }}? Обратите
+                  внимание, что для вашего собеседника, как и для вас, чат будет удален
+                  <b>без возможности восстановления. </b>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                <a href="/admin-add-chat/delete/{{ i.id }}" class="btn btn-danger">Удалить</a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                <a href="userchatdelete/{{ i.id }}" class="btn btn-danger">Удалить</a>
               </div>
             </div>
           </div>

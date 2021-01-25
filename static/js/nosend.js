@@ -34,7 +34,9 @@ function sendMessage() {
 		if (xmlhttp.readyState == 4) {
 			if (xmlhttp.status == 200) {
 				var box = document.getElementById('messageBox');
+				if (xmlhttp.responseText != '<empty>'){
 				box.innerHTML += xmlhttp.responseText;
+				}
 			}
 		}
 	};
@@ -77,7 +79,7 @@ var xmlhttp = getXmlHttp();
 				    }
                     document.getElementById('lastMessageID').value = xmlhttp.responseText;
 				}
-				setTimeout(checkUpdate, 10000, chatid);
+				setTimeout(checkUpdate, 8000, chatid);
 			}
 		}
 	};

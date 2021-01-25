@@ -13,7 +13,7 @@
     <header class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
           <p class="h5 my-0 me-md-auto fw-normal mr-auto">lowfc chat</p>
           <nav class="my-2 my-md-0 me-md-3">
-            <a class="p-2 text-dark" href="/">Главная</a>
+            <a class="p-2 text-dark" href="/">Аккаунт</a>
             <a class="p-2 text-dark" href="/findpeople">Поиск людей</a>
             <a class="p-2 text-dark" href="/chat">Чат</a>
               <a class="p-2 text-danger" href="/login">Выйти</a>
@@ -27,6 +27,26 @@
     </header>
 </head>
 <body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category == 'error' %}
+            <div class="alert alert-danger" style="width: 40%; margin-left: 2%;">
+                <b><p>Ошибка!</p></b>
+                <p>{{message}}</p>
+            </div>
+      {% elif category == 'success' %}
+            <div class="alert alert-success" style="width: 40%; margin-left: 2%;">
+                <b><p>Успешно!</p></b>
+                <p>{{message}}</p>
+            </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
     {% block body %}{% endblock %}
 </body>
 </html>

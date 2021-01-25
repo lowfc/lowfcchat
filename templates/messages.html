@@ -1,16 +1,20 @@
 {% for i in messages %}
-    <div class="list-group" id="{{i.id}}">
+<div id="{{i.id}}" style="width: 100%; position: relative; height: auto; min-height: 50px; margin-bottom: 2px; overflow: hidden; ">
+    <div class="list-group" style="width: auto; float:
+    {% if i.sendby == session['logged_user_id'] %} right; {% else %} left; {% endif %} max-width:70%; word-wrap: break-word;">
         {% if i.sendby == 0 %}
-            <p class="list-group-item list-group-item-action list-group-item-info">{{i.content}}</p>
+            <p class="list-group-item list-group-item-action list-group-item-info" style="margin-bottom: 0;">{{i.content}}</p>
         {% else %}
             {% if i.sendby == session['logged_user_id'] %}
-            <p class="list-group-item list-group-item-action list-group-item-secondary">(Вы) {{i.content}}
+            <p class="list-group-item list-group-item-action list-group-item-secondary" style="margin-bottom: 0; background: lightgreen;">{{i.content}}
                 (<a onclick="deleteMessage({{ i.id }})">Удалить</a>)
             </p>
             {% else %}
-            <p class="list-group-item list-group-item-action list-group-item-secondary">{{i.content}}
+            <p class="list-group-item list-group-item-action list-group-item-secondary" style="margin-bottom: 0; background: #E1E1E1;">{{i.content}}
             </p>
             {% endif %}
         {% endif %}
     </div>
+    <br>
+</div>
 {% endfor %}

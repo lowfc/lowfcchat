@@ -6,6 +6,7 @@
 
 {% block body %}
 <script src="../static/js/nosend.js"></script>
+<link rel="stylesheet" href="../static/css/style.css">
 
 <script type="text/javascript">
 var chatid = {{chatid}};
@@ -28,11 +29,22 @@ var xmlhttp = getXmlHttp();
 
 
 <!-- Вот так можно обратиться к имени собеседника -->
-<h3>{{interlocutor[0]}} {{interlocutor[1]}}</h3>
+
+<div class="container" style="box-shadow; margin-bottom: -30px; box-shadow: 0px 0px 4px 0px rgba(50, 50, 50, 0.50);">
+  <div class="row">
+      {% if is_default_photo %}
+      <a href="/id{{interlocutor_id}}"><img src="../static/user_photos/default.jpg" class="microimage"></a>
+      {% else %}
+      <a href="/id{{interlocutor_id}}"><img src="../static/user_photos/{{interlocutor_id}}_userpic.jpg" class="microimage"></a>
+      {% endif %}
+      <a href="/id{{interlocutor_id}}" style="margin: 23px 0;">{{interlocutor[0]}} {{interlocutor[1]}}</a>
+      <p class="text-secondary" style="position: absolute; right:100px; margin-top: 23px;">{{chatname}}</p>
+  </div>
+</div>
 
 
 <!-- При загрузке страницы содержимое messageBox будет очищено, ничего не добавлять -->
-<div class="container mt-5" id="messageBox" style="overflow: auto; height: 100%;">
+<div class="container mt-5" id="messageBox" style="overflow: auto; height: 100%; margin-bottom: 50px;">
 
     <!-- Анимация загрузки -->
     <div class="spinner-grow text-primary" role="status">
@@ -63,7 +75,7 @@ var xmlhttp = getXmlHttp();
 
 
 
-<div class="fixed-bottom input-group w-100" name="sender">
+<div class="fixed-bottom input-group w-100" style="margin-top: 100px;" name="sender">
     <input type="text" class="form-control" id="inputContent" name="message" placeholder="Введите сообщение" aria-describedby="basic-addon1">
     <input type="hidden" id="inputChatID" value="{{chatid}}">
     <div class="input-group-append">
